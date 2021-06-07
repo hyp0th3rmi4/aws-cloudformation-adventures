@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  This template is used to deploy a simple vpc that is partitioned
+  in a private and public network, with a configured NAT gateway for     
+  the private network and an internet gateway for the public
+  network.
+  
+# Resources define the entities that the template is composed of that represent
+# infrastructure and services that will be deployed with the stack.
+# 
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+Resources:
+  # VPC. This is the main component of our template, within the VPC we will be defining the subnets and
+  # connect to it all components required to create the stack.
+  #
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc.html
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-VPC"]]
+  # Subnets Definition: in this section we define the two subnets public and private
+  # and also create an ElasticIP and a NAT gateway to attach it to the private network
+  # so that we can have an outgoing traffic to add patches to the instances within the
+  # private subnet.
+  #
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet.html
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-southeast-2a
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-Pub-SubNet"]]
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-southeast-2a
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-Priv-SubNet"]]
+  # Internet Gateway. This component provides internet connectivity to the internet both ways (in and out).
+  # The gatewat needs to be attached to a VPC. Therefore it is important to explicitly attach it to the
+  # VPC otherwise it won't be connected.
+  #
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-internetgateway.html
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc-gateway-attachment.html
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: VPC
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-IGW"]]
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+  # ElasticIP definition, we don't need to add many attributes here, simply let Amazon do the
+  # work for you, we will only need to reference the elastic IP in the gateway.
+  #
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-elasticip.html
+  ElasticIPAddress:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-NGW-EIP"]]
+  # NAT Gateway. This component requires two references an allocation fo the elastic IP address to
+  # use and a designated subnet to be attached to.
+  #
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-natgateway.html
+  NatGateway:  
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: 
+        Fn::GetAtt: 
+        - ElasticIPAddress
+        - AllocationId
+      SubnetId: !Ref PrivateSubnet
+      Tags: 
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-NGW"]]
