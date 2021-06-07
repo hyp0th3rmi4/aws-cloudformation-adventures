@@ -1,0 +1,25 @@
+[{  
+   "ParameterKey"    :  "InstanceType",
+   "ParameterValue"  :  "t2.micro"
+},{
+   "ParameterKey"    :  "InstanceName",
+   "ParameterValue"  :  "floating-dumbo"
+},{
+   "ParameterKey"    :  "InstanceShutdownBehaviour",
+   "ParameterValue"  :  "stop"
+},{
+   "ParameterKey"    :  "InstanceKeyPairName",
+   "ParameterValue"  :  "aws-lab-ec2"
+},{
+   "ParameterKey"    :  "InstanceTenancy",
+   "ParameterValue"  :  "default"
+},{
+   "ParameterKey"    :  "SubnetId",
+   "ParameterValue"  :  "subnet-057d74c43838d000e"
+},{
+  "ParameterKey"    :  "VpcId",
+  "ParameterValue"  :  "vpc-03f63747165bef0b6"
+},{
+   "ParameterKey"    :  "ImageId",
+   "ParameterValue"  :  "ami-0186908e2fdeea8f3"
+}]

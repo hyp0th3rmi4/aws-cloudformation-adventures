@@ -1,0 +1,8 @@
+[{  
+   "ParameterKey":"PublicSubnetAZ",
+   "ParameterValue":"ap-southeast-2c"
+},{
+   "ParameterKey":"PrivateSubnetAZ",
+   "ParameterValue":"ap-southeast-2c"
+}]
+

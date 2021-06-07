@@ -1,0 +1,10 @@
+[{
+  "ParameterKey"    :  "BucketName",
+  "ParameterValue"  :  "floating-dumbo"
+},{
+  "ParameterKey"    :  "BucketVersioning",
+  "ParameterValue"  :  "Enabled"
+},{
+  "ParameterKey"    :  "BucketAccessControl",
+  "ParameterValue"  :  "Private"
+}]
