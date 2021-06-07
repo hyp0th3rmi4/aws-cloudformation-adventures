@@ -4,7 +4,7 @@ Description: >
   in a private and public network, with a configured NAT gateway for     
   the private network and an internet gateway for the public
   network.
-
+  
 # Resources define the entities that the template is composed of that represent
 # infrastructure and services that will be deployed with the stack.
 # 
@@ -50,3 +50,21 @@ Resources:
       Tags:
         - Key: Name
           Value: !Join ['', [!Ref "AWS::StackName", "-Priv-SubNet"]]
+  # Internet Gateway. This component provides internet connectivity to the internet both ways (in and out).
+  # The gatewat needs to be attached to a VPC. Therefore it is important to explicitly attach it to the
+  # VPC otherwise it won't be connected.
+  #
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-internetgateway.html
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc-gateway-attachment.html
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: VPC
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join ['', [!Ref "AWS::StackName", "-IGW"]]
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
