@@ -14,4 +14,4 @@ Resources:
       InstanceTenancy: default
       Tags:
         - Key: Name
-        - Value: !Join ['', [!Ref "AWS::StackName", "-VPC"]]
+          Value: !Join ['', [!Ref "AWS::StackName", "-VPC"]]
